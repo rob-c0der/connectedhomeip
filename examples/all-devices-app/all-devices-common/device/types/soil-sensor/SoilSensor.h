@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <app/clusters/power-source-server/PowerSourceCluster.h>
 #include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
 #include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
 #include <device/api/SingleEndpoint.h>
@@ -27,6 +28,12 @@ namespace app {
 
 class SoilSensor : public SingleEndpoint
 {
+    using Feature                               = Clusters::PowerSource::Feature;
+    constexpr static auto BatPercentRemainingId = Clusters::PowerSource::Attributes::BatPercentRemaining::Id;
+
+    using SimpleBatteryPowerSourceCluster = Clusters::PowerSourceCluster<BitFlags<Feature>(Feature::kBattery).Raw(),
+                                                                         OptionalAttributeSet<BatPercentRemainingId>::All()>;
+
 public:
     SoilSensor(TimerDelegate & timerDelegate,
                Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
@@ -42,14 +49,20 @@ public:
 
     Clusters::SoilMeasurementCluster & SoilMeasurementCluster() { return mSoilMeasurementCluster.Cluster(); }
     Clusters::TemperatureMeasurementCluster & TemperatureMeasurementCluster() { return mTemperatureMeasurementCluster.Cluster(); }
+    SimpleBatteryPowerSourceCluster & PowerSourceCluster() { return mBatteryPowerSourceCluster.Cluster(); }
+
+    virtual void PauseSimulation() {}
 
 protected:
     TimerDelegate & mTimerDelegate;
     Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type mMoistureLimits;
     Clusters::TemperatureMeasurementCluster::StartupConfiguration mTempConfig;
+    EndpointId mEndpointList[1] = { kInvalidEndpointId };
+
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::SoilMeasurementCluster> mSoilMeasurementCluster;
     LazyRegisteredServerCluster<Clusters::TemperatureMeasurementCluster> mTemperatureMeasurementCluster;
+    LazyRegisteredServerCluster<SimpleBatteryPowerSourceCluster> mBatteryPowerSourceCluster;
 };
 
 } // namespace app

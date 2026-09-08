@@ -51,6 +51,20 @@ CHIP_ERROR SoilSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelPr
     mSoilMeasurementCluster.Create(endpoint, mMoistureLimits);
     ReturnErrorOnFailure(provider.AddCluster(mSoilMeasurementCluster.Registration()));
 
+    // Create the power source cluster.
+    SimpleBatteryPowerSourceCluster::Config powerConfig("Soil Sensor Battery"_span,
+                                                        Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable,
+                                                        mTimerDelegate);
+    powerConfig.usedOptionalAttributes.Set<BatPercentRemainingId>();
+    powerConfig.status = Clusters::PowerSource::PowerSourceStatusEnum::kActive;
+    powerConfig.order  = 0;
+    powerConfig.batPercentRemaining.SetNonNull(200); // 100% (doubled percentage)
+    mEndpointList[0] = endpoint;
+
+    mBatteryPowerSourceCluster.Create(endpoint, powerConfig);
+    ReturnErrorOnFailure(mBatteryPowerSourceCluster.Cluster().SetEndpointList(Span<const EndpointId>(mEndpointList)));
+    ReturnErrorOnFailure(provider.AddCluster(mBatteryPowerSourceCluster.Registration()));
+
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
@@ -59,6 +73,11 @@ CHIP_ERROR SoilSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelPr
 void SoilSensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+    if (mBatteryPowerSourceCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mBatteryPowerSourceCluster.Cluster()));
+        mBatteryPowerSourceCluster.Destroy();
+    }
     if (mTemperatureMeasurementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mTemperatureMeasurementCluster.Cluster()));

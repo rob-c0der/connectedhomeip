@@ -39,8 +39,11 @@ public:
     // TimerContext
     void TimerFired() override;
 
+    void PauseSimulation() override;
+
 private:
     DefaultTimerDelegate mTimerDelegate;
+    bool mSimulationPaused = false;
     Clusters::SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type mSoilMoistureMeasuredValue;
     DataModel::Nullable<int16_t> mTemperatureMeasuredValue;
 };
