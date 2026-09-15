@@ -1,6 +1,5 @@
 /*
  *    Copyright (c) 2026 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,22 +13,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "BleInit.h"
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/CHIPDeviceLayer.h>
-#endif
+#include "OOBAccessors.h"
+#include "impl/LoggingCooktop.h"
+#include <lib/support/CodeUtils.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
+#include <oob-accessors/clusters/OnOffOOBAccessor.h>
 
 namespace chip::app {
 
-CHIP_ERROR InitBle(uint32_t bleController)
+void RegisterOOBAccessors(LoggingCooktop & device, OOBAccessorRegistry & registry)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr));
-    ReturnErrorOnFailure(DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(bleController, false));
-    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
-#endif
-    return CHIP_NO_ERROR;
+    LogErrorOnFailure(
+        registry.Register(std::make_unique<OnOffOOBAccessor>(device.Surface1().OnOffCluster(), device.Surface1().GetEndpointId())));
+    LogErrorOnFailure(
+        registry.Register(std::make_unique<OnOffOOBAccessor>(device.Surface2().OnOffCluster(), device.Surface2().GetEndpointId())));
 }
 
 } // namespace chip::app

@@ -22,6 +22,7 @@
 
 #include <device/types/ambient-context-sensor/OOBAccessors.h>
 #include <device/types/boolean-state-sensor/OOBAccessors.h>
+#include <device/types/cooktop/OOBAccessors.h>
 #include <device/types/dimmable-light/OOBAccessors.h>
 #include <device/types/dimmable-plug-in-unit/OOBAccessors.h>
 #include <device/types/electrical-sensor/OOBAccessors.h>
@@ -34,6 +35,7 @@
 #include <device/types/robotic-vacuum-cleaner/OOBAccessors.h>
 #include <device/types/root-node/OOBAccessors.h>
 #include <device/types/soil-sensor/OOBAccessors.h>
+#include <device/types/water-valve/OOBAccessors.h>
 
 namespace chip::app {
 

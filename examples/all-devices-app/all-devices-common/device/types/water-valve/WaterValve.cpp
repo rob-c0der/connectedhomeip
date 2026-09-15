@@ -81,8 +81,17 @@ Clusters::ValveConfigurationAndControlCluster & WaterValve::ValveConfigurationAn
 
 DataModel::Nullable<Percent> WaterValve::HandleOpenValve(DataModel::Nullable<Percent> level)
 {
-    Percent targetLevel = level.ValueOr(100);
+    Percent targetLevel = level.ValueOr(mLastOpenLevel);
     ChipLogProgress(AppServer, "WaterValve: Opening valve to level %u", targetLevel);
+    // Remember the level so a later open without an explicit level reopens to the same place.
+    if (targetLevel > 0)
+    {
+        mLastOpenLevel = targetLevel;
+    }
+    if (mValveCluster.IsConstructed())
+    {
+        mValveCluster.Cluster().UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum::kOpen);
+    }
     return DataModel::MakeNullable(targetLevel);
 }
 
@@ -92,6 +101,7 @@ CHIP_ERROR WaterValve::HandleCloseValve()
     if (mValveCluster.IsConstructed())
     {
         mValveCluster.Cluster().UpdateCurrentLevel(0);
+        mValveCluster.Cluster().UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum::kClosed);
     }
     return CHIP_NO_ERROR;
 }

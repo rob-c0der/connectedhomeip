@@ -44,6 +44,7 @@ if(ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS)
         "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/RvcOOBAccessor.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/ambient-context-sensor/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/boolean-state-sensor/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/cooktop/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-light/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-plug-in-unit/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/OOBAccessors.cpp"
@@ -57,5 +58,7 @@ if(ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS)
         "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/SoilSensorAccessor.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValveAccessor.cpp"
     )
 endif()

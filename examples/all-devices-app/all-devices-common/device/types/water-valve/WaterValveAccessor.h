@@ -1,6 +1,5 @@
 /*
  *    Copyright (c) 2026 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,22 +13,32 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "BleInit.h"
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/CHIPDeviceLayer.h>
-#endif
+#pragma once
+
+#include <optional>
+
+#include <app/AttributeValueDecoder.h>
+#include <app/ConcreteAttributePath.h>
+#include <device/types/water-valve/WaterValve.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
+#include <oob-accessors/OOBAccessor.h>
 
 namespace chip::app {
 
-CHIP_ERROR InitBle(uint32_t bleController)
+class WaterValveAccessor : public OOBAccessor
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr));
-    ReturnErrorOnFailure(DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(bleController, false));
-    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
-#endif
-    return CHIP_NO_ERROR;
-}
+public:
+    explicit WaterValveAccessor(WaterValve & device) : mDevice(device) {}
+    ~WaterValveAccessor() override = default;
+
+    std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) override;
+
+private:
+    std::optional<CHIP_ERROR> SetAttribute(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
+
+    WaterValve & mDevice;
+};
 
 } // namespace chip::app
