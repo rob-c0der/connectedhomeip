@@ -39,7 +39,10 @@ public:
     // TimerContext
     void TimerFired() override;
 
+    void PauseSimulation() override;
+
 private:
+    bool mSimulationPaused      = false;
     uint16_t mFlowMeasuredValue = 0;
 };
 

@@ -67,8 +67,19 @@ void IncreasingFlowSensor::Unregister(CodeDrivenDataModelProvider & provider)
     FlowSensor::Unregister(provider);
 }
 
+void IncreasingFlowSensor::PauseSimulation()
+{
+    mSimulationPaused = true;
+    mTimerDelegate.CancelTimer(this);
+}
+
 void IncreasingFlowSensor::TimerFired()
 {
+    if (mSimulationPaused)
+    {
+        return;
+    }
+
     mFlowMeasuredValue = static_cast<uint16_t>(mFlowMeasuredValue + kFlowStepValue);
     if (mFlowMeasuredValue > kDefaultFlowConfig.maxMeasuredValue.Value())
     {

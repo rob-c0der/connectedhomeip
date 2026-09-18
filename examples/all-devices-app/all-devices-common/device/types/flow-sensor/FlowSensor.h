@@ -42,6 +42,13 @@ public:
 
     Clusters::FlowMeasurementCluster & FlowMeasurementCluster() { return mFlowMeasurementCluster.Cluster(); }
 
+    /// Stops any background simulation driven by a derived class.
+    ///
+    /// Called when an out-of-band (e.g. Pigweed RPC) write injects an explicit value, so that the
+    /// simulation does not immediately overwrite it. The base device has no simulation, so this is
+    /// a no-op by default.
+    virtual void PauseSimulation() {}
+
 protected:
     TimerDelegate & mTimerDelegate;
     const Clusters::FlowMeasurementCluster::Config mFlowConfig;

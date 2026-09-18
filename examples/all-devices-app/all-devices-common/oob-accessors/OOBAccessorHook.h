@@ -26,6 +26,7 @@
 #include <device/types/dimmable-light/OOBAccessors.h>
 #include <device/types/dimmable-plug-in-unit/OOBAccessors.h>
 #include <device/types/electrical-sensor/OOBAccessors.h>
+#include <device/types/flow-sensor/OOBAccessors.h>
 #include <device/types/mode-select/OOBAccessors.h>
 #include <device/types/mounted-dimmable-load-control/OOBAccessors.h>
 #include <device/types/mounted-on-off-control/OOBAccessors.h>
