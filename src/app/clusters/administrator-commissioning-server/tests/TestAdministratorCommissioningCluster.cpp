@@ -46,12 +46,12 @@ struct TestAdministratorCommissioningCluster : public chip::Testing::AppContext
 {
     AdministratorCommissioningLogic::Context CreateContext()
     {
-        EXPECT_SUCCESS(mCommissioningWindowManager.Init({
+        mCommissioningWindowManager.Init({
             .fabricTable     = mFabricTable,
             .sessionManager  = GetSecureSessionManager(),
             .exchangeManager = GetExchangeManager(),
             .failSafeContext = mFailSafeContext,
-        }));
+        });
         return AdministratorCommissioningLogic::Context{
             .commissioningWindowManager = mCommissioningWindowManager,
             .fabricTable                = mFabricTable,

@@ -76,11 +76,7 @@ public:
 
     CommissioningWindowManager() : mPASESession(*this) {}
 
-    CHIP_ERROR Init(const Context & context)
-    {
-        mContext.emplace(context);
-        return CHIP_NO_ERROR;
-    }
+    void Init(const Context & context) { mContext.emplace(context); }
 
     System::Clock::Seconds32 MaxCommissioningTimeout() const;
 

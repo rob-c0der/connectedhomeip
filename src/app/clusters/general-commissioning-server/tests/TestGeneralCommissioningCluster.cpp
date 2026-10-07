@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
@@ -52,12 +51,12 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
 
     GeneralCommissioningCluster::Context CreateStandardContext()
     {
-        EXPECT_SUCCESS(mCommissioningWindowManager.Init({
+        mCommissioningWindowManager.Init({
             .fabricTable     = mFabricTable,
             .sessionManager  = mSessionManager,
             .exchangeManager = mExchangeManager,
             .failSafeContext = mFailSafeContext,
-        }));
+        });
         return
         {
             .commissioningWindowManager = mCommissioningWindowManager,                          //

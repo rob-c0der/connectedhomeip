@@ -13,7 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
@@ -221,12 +220,12 @@ struct TestOperationalCredentials : public ::testing::Test
 
     OperationalCredentialsCluster::Context MakeContext(BitFlags<Feature> featureMap = {})
     {
-        EXPECT_SUCCESS(mCommissioningWindowManager.Init({
+        mCommissioningWindowManager.Init({
             .fabricTable     = mFabricTable,
             .sessionManager  = mSessionManager,
             .exchangeManager = mExchangeManager,
             .failSafeContext = mFailSafeContext,
-        }));
+        });
         return {
             .fabricTable                = mFabricTable,
             .failSafeContext            = mFailSafeContext,
