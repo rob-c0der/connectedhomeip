@@ -464,7 +464,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if CONFIG_NETWORK_LAYER_BLE
     mBleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 #endif
-    SuccessOrExit(err);
 
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, mDeviceStorage, &GetFabricTable(),
                          *mSessionKeystore);
