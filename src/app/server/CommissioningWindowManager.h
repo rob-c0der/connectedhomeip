@@ -67,6 +67,9 @@ public:
         Messaging::ExchangeManager & exchangeManager;
         app::FailSafeContext & failSafeContext;
 #if CONFIG_NETWORK_LAYER_BLE
+        // Optional: CONFIG_NETWORK_LAYER_BLE may be enabled at compile time even when no
+        // BleLayer is active at runtime (e.g. platforms using GenericConnectivityManagerImpl_NoBLE
+        // such as the fake platform, unit tests, or IP-only test harnesses).
         Ble::BleLayer * bleLayer = nullptr;
 #endif
     };
