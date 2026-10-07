@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
@@ -27,6 +28,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <messaging/ExchangeMgr.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -219,6 +221,12 @@ struct TestOperationalCredentials : public ::testing::Test
 
     OperationalCredentialsCluster::Context MakeContext(BitFlags<Feature> featureMap = {})
     {
+        EXPECT_SUCCESS(mCommissioningWindowManager.Init({
+            .fabricTable     = mFabricTable,
+            .sessionManager  = mSessionManager,
+            .exchangeManager = mExchangeManager,
+            .failSafeContext = mFailSafeContext,
+        }));
         return {
             .fabricTable                = mFabricTable,
             .failSafeContext            = mFailSafeContext,
@@ -237,6 +245,7 @@ struct TestOperationalCredentials : public ::testing::Test
     FabricTable mFabricTable;
     FailSafeContext mFailSafeContext;
     SessionManager mSessionManager;
+    Messaging::ExchangeManager mExchangeManager;
     CommissioningWindowManager mCommissioningWindowManager;
     Credentials::GroupDataProviderImpl mGroupDataProvider;
     TestDACProvider mDacProvider;

@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
@@ -25,8 +26,10 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/NetworkCommissioning.h>
+#include <transport/SessionManager.h>
 #include <vector>
 
 namespace {
@@ -49,6 +52,12 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
 
     GeneralCommissioningCluster::Context CreateStandardContext()
     {
+        EXPECT_SUCCESS(mCommissioningWindowManager.Init({
+            .fabricTable     = mFabricTable,
+            .sessionManager  = mSessionManager,
+            .exchangeManager = mExchangeManager,
+            .failSafeContext = mFailSafeContext,
+        }));
         return
         {
             .commissioningWindowManager = mCommissioningWindowManager,                          //
@@ -66,6 +75,8 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
     CommissioningWindowManager mCommissioningWindowManager;
     FabricTable mFabricTable;
     app::FailSafeContext mFailSafeContext;
+    SessionManager mSessionManager;
+    Messaging::ExchangeManager mExchangeManager;
 };
 
 TEST_F(TestGeneralCommissioningCluster, TestAttributes)
