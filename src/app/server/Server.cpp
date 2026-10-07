@@ -494,6 +494,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    app::DnssdServer::Instance().SetTransportMgrBase(&mTransports);
+#endif
 
     TEMPORARY_RETURN_IGNORED Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
 

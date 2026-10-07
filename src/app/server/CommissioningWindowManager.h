@@ -23,6 +23,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningModeProvider.h>
+#include <app/server/Dnssd.h>
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
 #endif
@@ -66,6 +67,7 @@ public:
         SessionManager & sessionManager;
         Messaging::ExchangeManager & exchangeManager;
         app::FailSafeContext & failSafeContext;
+        app::DnssdServer & dnssdServer = app::DnssdServer::Instance();
 #if CONFIG_NETWORK_LAYER_BLE
         // Optional: CONFIG_NETWORK_LAYER_BLE may be enabled at compile time even when no
         // BleLayer is active at runtime (e.g. platforms using GenericConnectivityManagerImpl_NoBLE

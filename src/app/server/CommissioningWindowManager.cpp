@@ -102,7 +102,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
-        CHIP_ERROR err = app::DnssdServer::Instance().AdvertiseOperational();
+        CHIP_ERROR err = context.dnssdServer.AdvertiseOperational();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -571,7 +571,10 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     }
 
     // reset all advertising, switching to our new commissioning mode.
-    app::DnssdServer::Instance().StartServer();
+    if (mContext.has_value())
+    {
+        mContext->dnssdServer.StartServer();
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -595,7 +598,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown, boo
         // Stop advertising commissioning mode, since we're not accepting PASE
         // connections right now.  If we start accepting them again (via
         // AdvertiseAndListenForPASE) that will call StartAdvertisement as needed.
-        app::DnssdServer::Instance().StartServer();
+        context.dnssdServer.StartServer();
     }
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -632,12 +635,14 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown, boo
 
 CHIP_ERROR CommissioningWindowManager::SetTemporaryDiscriminator(uint16_t discriminator)
 {
-    return app::DnssdServer::Instance().SetEphemeralDiscriminator(MakeOptional(discriminator));
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    return mContext->dnssdServer.SetEphemeralDiscriminator(MakeOptional(discriminator));
 }
 
 CHIP_ERROR CommissioningWindowManager::RestoreDiscriminator()
 {
-    return app::DnssdServer::Instance().SetEphemeralDiscriminator(NullOptional);
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    return mContext->dnssdServer.SetEphemeralDiscriminator(NullOptional);
 }
 
 void CommissioningWindowManager::HandleCommissioningWindowTimeout(chip::System::Layer * aSystemLayer, void * aAppState)
