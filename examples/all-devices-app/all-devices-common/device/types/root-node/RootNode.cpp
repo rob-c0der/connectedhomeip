@@ -18,17 +18,13 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/InteractionModelEngine.h>
 #include <app/clusters/groupcast/GroupcastCluster.h>
 #include <app/clusters/groupcast/GroupcastContext.h>
-#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::DeviceLayer;
 namespace chip {
 namespace app {
 

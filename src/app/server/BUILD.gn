@@ -133,14 +133,29 @@ source_set("commissioning_window_manager") {
   ]
 }
 
-static_library("server") {
-  output_name = "libCHIPAppServer"
-
+source_set("acl_storage") {
   sources = [
     "AclStorage.cpp",
     "AclStorage.h",
     "DefaultAclStorage.cpp",
     "DefaultAclStorage.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/access",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+static_library("server") {
+  output_name = "libCHIPAppServer"
+
+  sources = [
     "EchoHandler.cpp",
     "EchoHandler.h",
     "Server.cpp",
@@ -152,6 +167,7 @@ static_library("server") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":acl_storage",
     ":commissioning_window_manager",
     ":dnssd",
     "${chip_root}/src/access",

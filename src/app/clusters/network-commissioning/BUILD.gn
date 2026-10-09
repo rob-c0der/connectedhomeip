@@ -56,12 +56,13 @@ source_set("network-commissioning") {
   public_deps = [
     ":thread-response-encoding",
     ":wifi-response-encoding",
+    "${chip_root}/src/app",
     "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app/clusters/general-commissioning-server:bread-crumb-tracker",
     "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/credentials",
+    "${chip_root}/src/platform",
   ]
 
   # TODO: we have a dependency on GeneralCommissioning: setting a breadcrumb

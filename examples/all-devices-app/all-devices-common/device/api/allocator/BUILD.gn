@@ -22,7 +22,11 @@ source_set("endpoint-id-allocator") {
     "EndpointIdAllocator.h",
   ]
 
-  public_deps = [ "${chip_root}/src/lib" ]
+  public_deps = [
+    "${chip_root}/src/app/util:types",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+  ]
 
   public_configs = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device:includes",

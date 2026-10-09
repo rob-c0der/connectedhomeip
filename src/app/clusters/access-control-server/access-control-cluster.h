@@ -20,7 +20,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
-#include <app/server/Server.h>
 #include <clusters/AccessControl/ClusterId.h>
 #include <clusters/AccessControl/Metadata.h>
 #include <credentials/FabricTable.h>

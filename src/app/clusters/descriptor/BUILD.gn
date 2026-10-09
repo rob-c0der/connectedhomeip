@@ -23,7 +23,6 @@ source_set("descriptor") {
   public_deps = [
     "${chip_root}/src/app:attribute-access",
     "${chip_root}/src/app/data-model-provider:metadata",
-    "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",

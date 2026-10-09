@@ -23,12 +23,14 @@ source_set("group-key-mgmt-server") {
   public_deps = [
     "${chip_root}/src/app:attribute-access",
     "${chip_root}/src/app:test-event-trigger",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model-provider:metadata",
-    "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/clusters/GroupKeyManagement",
+    "${chip_root}/zzz_generated/app-common/clusters/Groups:metadata",
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]

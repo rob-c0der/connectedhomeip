@@ -48,13 +48,16 @@ source_set("access-control-server") {
   public_deps = [
     ":arl-encoder",
     "${chip_root}/src/access:access_config",
+    "${chip_root}/src/app",
     "${chip_root}/src/app:attribute-access",
     "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/app/data-model-provider:metadata",
-    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server:acl_storage",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
     "${chip_root}/zzz_generated/app-common/clusters/AccessControl",
   ]
 

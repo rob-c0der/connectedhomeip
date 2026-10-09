@@ -25,7 +25,6 @@
 #include <app/clusters/access-control-server/access-control-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server/Server.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -35,7 +34,6 @@
 #include <app/data-model/Encode.h>
 #include <app/reporting/reporting.h>
 #include <app/server/AclStorage.h>
-#include <app/server/Server.h>
 
 #include <clusters/AccessControl/ClusterId.h>
 #include <clusters/AccessControl/Metadata.h>

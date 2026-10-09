@@ -18,11 +18,19 @@ source_set("groupcast") {
   sources = [
     "GroupcastCluster.cpp",
     "GroupcastCluster.h",
+    "GroupcastContext.h",
   ]
   public_deps = [
+    "${chip_root}/src/access",
+    "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/access-control-server:access-control-event-helper",
-    "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:timer-delegate",
+    "${chip_root}/src/protocols/interaction_model",
+    "${chip_root}/src/transport/raw",
     "${chip_root}/zzz_generated/app-common/clusters/Groupcast",
   ]
 }

@@ -18,9 +18,10 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server/Server.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/Metadata.h>
+#include <credentials/FabricTable.h>
+#include <credentials/GroupDataProvider.h>
 
 namespace chip {
 namespace app {

@@ -30,7 +30,6 @@ using namespace chip::Credentials;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GroupKeyManagement;
 using namespace chip::app::Clusters::GroupKeyManagement::Attributes;
-using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
