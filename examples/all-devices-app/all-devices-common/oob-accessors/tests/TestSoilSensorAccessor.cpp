@@ -312,4 +312,37 @@ TEST_F(TestSoilSensorAccessor, IncreasingMoistureSoilSensor_RegisterAndOOB)
     sensor.Unregister(mProvider);
 }
 
+TEST_F(TestSoilSensorAccessor, IncreasingMoistureSoilSensor_SimulationPauseResume)
+{
+    IncreasingMoistureSoilSensor sensor;
+    EXPECT_EQ(sensor.Register(2, mProvider), CHIP_NO_ERROR);
+
+    InMemoryOOBAccessorRegistry registry;
+    RegisterOOBAccessors(sensor, registry);
+
+    EXPECT_FALSE(sensor.IsSimulationPaused());
+
+    // Pause via registry broadcast
+    EXPECT_EQ(registry.BroadcastAction(OOBDataSerializer::kPauseSimulationAction, {}), CHIP_NO_ERROR);
+    EXPECT_TRUE(sensor.IsSimulationPaused());
+
+    // Resume via registry broadcast
+    EXPECT_EQ(registry.BroadcastAction(OOBDataSerializer::kResumeSimulationAction, {}), CHIP_NO_ERROR);
+    EXPECT_FALSE(sensor.IsSimulationPaused());
+
+    // Unregister while paused resets paused state on teardown
+    EXPECT_EQ(registry.BroadcastAction(OOBDataSerializer::kPauseSimulationAction, {}), CHIP_NO_ERROR);
+    EXPECT_TRUE(sensor.IsSimulationPaused());
+    sensor.Unregister(mProvider);
+    EXPECT_FALSE(sensor.IsSimulationPaused());
+}
+
+TEST_F(TestSoilSensorAccessor, NonSimulatedSoilSensor_IgnoresSimulationActions)
+{
+    // mDevice is a base non-simulated SoilSensor registered in SetUp().
+    // Since it has no simulation control, simulation pause/resume actions are unhandled.
+    EXPECT_EQ(mRegistry.BroadcastAction(OOBDataSerializer::kPauseSimulationAction, {}), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(mRegistry.BroadcastAction(OOBDataSerializer::kResumeSimulationAction, {}), CHIP_ERROR_NOT_FOUND);
+}
+
 } // namespace

@@ -74,6 +74,7 @@ TEST_F(TestOOBAccessors, RegistryLifecycle)
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
     EXPECT_EQ(registry.HandleAction("NonExistentAction"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(registry.BroadcastAction("NonExistentAction"_span, {}), CHIP_ERROR_NOT_FOUND);
 
     registry.Clear();
     EXPECT_EQ(registry.Size(), 0U);

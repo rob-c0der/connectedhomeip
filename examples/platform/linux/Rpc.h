@@ -36,6 +36,9 @@ using RpcActionsSubscribeCallback = bool (*)(EndpointId endpointId, ClusterId cl
 
 void SubscribeActions(RpcActionsSubscribeCallback subscriber);
 
+class SimulationDelegate;
+void SetSimulationDelegate(SimulationDelegate * delegate);
+
 int Init(uint16_t rpcServerPort);
 
 } // namespace rpc

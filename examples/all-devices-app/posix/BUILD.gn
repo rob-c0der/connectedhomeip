@@ -176,6 +176,7 @@ executable("all-devices-app") {
       "PW_RPC_ENABLED=1",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_SIMULATION_SERVICE=1",
     ]
 
     sources += [ "${chip_root}/examples/platform/linux/Rpc.cpp" ]
@@ -190,6 +191,7 @@ executable("all-devices-app") {
       # and is not coupled with ember.
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:simulation_service.nanopb_rpc",
       "${chip_root}/examples/platform/linux:pw_rpc",
     ]
 

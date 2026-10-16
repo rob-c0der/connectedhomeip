@@ -86,7 +86,7 @@ struct NanPeerInfo
 struct ScanTimerCtx
 {
     chip::DeviceLayer::ConnectivityManagerImpl * self = nullptr;
-    guint subscribe_id;
+    uint32_t subscribe_id;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 

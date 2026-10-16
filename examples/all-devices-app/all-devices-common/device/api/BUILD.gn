@@ -19,6 +19,7 @@ source_set("device-interface") {
   sources = [
     "Interface.cpp",
     "Interface.h",
+    "SimulationControl.h",
   ]
 
   public_deps = [

@@ -54,6 +54,10 @@
 #include "pigweed/rpc_services/Locking.h"
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
+#if defined(PW_RPC_SIMULATION_SERVICE) && PW_RPC_SIMULATION_SERVICE
+#include "pigweed/rpc_services/Simulation.h"
+#endif // defined(PW_RPC_SIMULATION_SERVICE) && PW_RPC_SIMULATION_SERVICE
+
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 #define PW_TRACE_BUFFER_SIZE_BYTES 1024
 #include "pw_trace/trace.h"
@@ -104,6 +108,10 @@ Device device_service;
 Lighting lighting_service;
 #endif // defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
 
+#if defined(PW_RPC_SIMULATION_SERVICE) && PW_RPC_SIMULATION_SERVICE
+Simulation simulation_service;
+#endif // defined(PW_RPC_SIMULATION_SERVICE) && PW_RPC_SIMULATION_SERVICE
+
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 pw::trace::TraceService trace_service(pw::trace::GetTokenizedTracer());
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
@@ -138,6 +146,10 @@ void RegisterServices(pw::rpc::Server & server)
     server.RegisterService(lighting_service);
 #endif // defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
 
+#if defined(PW_RPC_SIMULATION_SERVICE) && PW_RPC_SIMULATION_SERVICE
+    server.RegisterService(simulation_service);
+#endif // defined(PW_RPC_SIMULATION_SERVICE) && PW_RPC_SIMULATION_SERVICE
+
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
     server.RegisterService(trace_service);
     PW_TRACE_SET_ENABLED(true);
@@ -152,6 +164,15 @@ void RegisterServices(pw::rpc::Server & server)
 }
 
 } // namespace
+
+#if defined(PW_RPC_SIMULATION_SERVICE) && PW_RPC_SIMULATION_SERVICE
+void SetSimulationDelegate(SimulationDelegate * delegate)
+{
+    simulation_service.SetDelegate(delegate);
+}
+#else
+void SetSimulationDelegate(SimulationDelegate * delegate) {}
+#endif // defined(PW_RPC_SIMULATION_SERVICE) && PW_RPC_SIMULATION_SERVICE
 
 #if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 void SubscribeActions(RpcActionsSubscribeCallback subscriber)

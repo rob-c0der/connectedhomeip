@@ -40,4 +40,27 @@ CHIP_ERROR InMemoryOOBAccessorRegistry::HandleAction(CharSpan action, ByteSpan t
     return CHIP_ERROR_NOT_FOUND;
 }
 
+CHIP_ERROR InMemoryOOBAccessorRegistry::BroadcastAction(CharSpan action, ByteSpan tlvData)
+{
+    CHIP_ERROR firstError = CHIP_NO_ERROR;
+    bool anyHandled       = false;
+    for (const auto & accessor : mAccessors)
+    {
+        auto result = accessor->HandleAction(action, tlvData);
+        if (result.has_value())
+        {
+            anyHandled = true;
+            if (*result != CHIP_NO_ERROR && firstError == CHIP_NO_ERROR)
+            {
+                firstError = *result;
+            }
+        }
+    }
+    if (firstError != CHIP_NO_ERROR)
+    {
+        return firstError;
+    }
+    return anyHandled ? CHIP_NO_ERROR : CHIP_ERROR_NOT_FOUND;
+}
+
 } // namespace chip::app

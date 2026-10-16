@@ -15,8 +15,11 @@
  *    limitations under the License.
  */
 #include "IncreasingMoistureSoilSensor.h"
+#include <device/types/soil-sensor/SoilSensorAccessor.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
+#include <oob-accessors/SimulatedAccessor.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
@@ -86,7 +89,36 @@ CHIP_ERROR IncreasingMoistureSoilSensor::Register(EndpointId endpoint, CodeDrive
 void IncreasingMoistureSoilSensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
     mTimerDelegate.CancelTimer(this);
+    mSimulationPaused = false;
     SoilSensor::Unregister(provider);
+}
+
+void IncreasingMoistureSoilSensor::PauseSimulation()
+{
+    if (mSimulationPaused)
+    {
+        return;
+    }
+    mSimulationPaused = true;
+    mTimerDelegate.CancelTimer(this);
+    ChipLogProgress(AppServer, "IncreasingMoistureSoilSensor: Simulation paused");
+}
+
+CHIP_ERROR IncreasingMoistureSoilSensor::ResumeSimulation()
+{
+    if (!mSimulationPaused)
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR err = mTimerDelegate.StartTimer(this, kIncreaseMoistureIntervalSec);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to start soil sensor simulation timer: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+    mSimulationPaused = false;
+    ChipLogProgress(AppServer, "IncreasingMoistureSoilSensor: Simulation resumed");
+    return CHIP_NO_ERROR;
 }
 
 void IncreasingMoistureSoilSensor::TimerFired()
@@ -122,6 +154,11 @@ void IncreasingMoistureSoilSensor::TimerFired()
     LogErrorOnFailure(tempCluster.SetMeasuredValue(temperature));
 
     VerifyOrDie(mTimerDelegate.StartTimer(this, kIncreaseMoistureIntervalSec) == CHIP_NO_ERROR);
+}
+
+void RegisterOOBAccessors(IncreasingMoistureSoilSensor & device, OOBAccessorRegistry & registry)
+{
+    LogErrorOnFailure(registry.Register(std::make_unique<SimulatedAccessor<SoilSensorAccessor>>(device)));
 }
 
 } // namespace app

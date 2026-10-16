@@ -53,6 +53,12 @@ public:
     CHIP_ERROR HandleAction(CharSpan action, ByteSpan tlvData);
 
     /**
+     * @brief Dispatches an action to all registered accessors, returning the first error encountered,
+     *        or CHIP_NO_ERROR if at least one accessor handled the action.
+     */
+    CHIP_ERROR BroadcastAction(CharSpan action, ByteSpan tlvData);
+
+    /**
      * @brief Clears all registered accessors during device teardown.
      */
     void Clear() { mAccessors.clear(); }

@@ -18,7 +18,9 @@
 
 #include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device/api/SimulationControl.h>
 #include <device/types/soil-sensor/SoilSensor.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
 #include <platform/DefaultTimerDelegate.h>
 
 namespace chip {
@@ -27,7 +29,7 @@ namespace app {
 /**
  * Simulated soil sensor that increases the reported moisture level over time.
  */
-class IncreasingMoistureSoilSensor : public SoilSensor, public TimerContext
+class IncreasingMoistureSoilSensor : public SoilSensor, public TimerContext, public SimulationControl
 {
 public:
     IncreasingMoistureSoilSensor();
@@ -39,9 +41,17 @@ public:
     // TimerContext
     void TimerFired() override;
 
+    // Simulation control
+    void PauseSimulation() override;
+    CHIP_ERROR ResumeSimulation() override;
+    bool IsSimulationPaused() const override { return mSimulationPaused; }
+
 private:
     DefaultTimerDelegate mTimerDelegate;
+    bool mSimulationPaused = false;
 };
+
+void RegisterOOBAccessors(IncreasingMoistureSoilSensor & device, OOBAccessorRegistry & registry);
 
 } // namespace app
 } // namespace chip
