@@ -862,7 +862,10 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
         {
-            RegisterCreator("power-source", []() { return MakeDevice<DecreasingBatteryPowerSource>(); });
+            RegisterCreator("power-source", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<DecreasingBatteryPowerSource>(GetSimulator());
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_SMOKE_CO_ALARM)
         {

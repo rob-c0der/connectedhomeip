@@ -16,28 +16,24 @@
  */
 #pragma once
 
+#include <device/api/SimulatedDevice.h>
 #include <device/types/power-source/BatteryPowerSource.h>
-#include <platform/DefaultTimerDelegate.h>
 
 namespace chip::app {
 
 /**
  * Simulated battery power source that decreases the reported battery level over time.
  */
-class DecreasingBatteryPowerSource : public BatteryPowerSource, public TimerContext
+class DecreasingBatteryPowerSource : public BatteryPowerSource, public SimulatedDevice
 {
 public:
-    DecreasingBatteryPowerSource();
-    ~DecreasingBatteryPowerSource() override;
+    explicit DecreasingBatteryPowerSource(Simulator & simulator);
+    ~DecreasingBatteryPowerSource() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    // TimerContext
-    void TimerFired() override;
-
-private:
-    DefaultTimerDelegate mTimerDelegate;
+    void OnSimulationTick() override;
 };
 
 } // namespace chip::app

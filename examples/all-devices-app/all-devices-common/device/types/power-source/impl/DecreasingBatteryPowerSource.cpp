@@ -16,35 +16,38 @@
  */
 #include "DecreasingBatteryPowerSource.h"
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+
 namespace chip::app {
 
+namespace {
 constexpr System::Clock::Seconds16 kDecreaseBatteryLevelInterval = System::Clock::Seconds16(1);
+constexpr uint32_t kFullVoltageMv                               = 3000;
+constexpr uint32_t kEmptyVoltageMv                              = 2000;
+} // namespace
 
-DecreasingBatteryPowerSource::DecreasingBatteryPowerSource() :
+DecreasingBatteryPowerSource::DecreasingBatteryPowerSource(Simulator & simulator) :
     BatteryPowerSource("Decreasing Battery Power Source"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable,
-                       mTimerDelegate)
+                       simulator.GetTimerDelegate()),
+    SimulatedDevice(simulator, kDecreaseBatteryLevelInterval)
 {}
-
-DecreasingBatteryPowerSource::~DecreasingBatteryPowerSource()
-{
-    mTimerDelegate.CancelTimer(this);
-}
 
 CHIP_ERROR DecreasingBatteryPowerSource::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                   EndpointComposition composition)
 {
     ReturnErrorOnFailure(BatteryPowerSource::Register(endpoint, provider, composition));
-    // Kick off the timer loop to decrease battery level every few seconds
-    return mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval);
+    StartSimulation();
+    return CHIP_NO_ERROR;
 }
 
 void DecreasingBatteryPowerSource::Unregister(CodeDrivenDataModelProvider & provider)
 {
+    StopSimulation();
     BatteryPowerSource::Unregister(provider);
-    mTimerDelegate.CancelTimer(this);
 }
 
-void DecreasingBatteryPowerSource::TimerFired()
+void DecreasingBatteryPowerSource::OnSimulationTick()
 {
     auto & batteryCluster = BatteryPowerSourceCluster();
     auto batteryLevel     = batteryCluster.GetBatPercentRemaining();
@@ -66,8 +69,6 @@ void DecreasingBatteryPowerSource::TimerFired()
 
     // Also drop the battery voltage linearly with the remaining percentage so
     // commissioners that periodically read attributes can display a voltage reading.
-    constexpr uint32_t kFullVoltageMv  = 3000;
-    constexpr uint32_t kEmptyVoltageMv = 2000;
     DataModel::Nullable<uint32_t> batteryVoltage;
     if (batteryLevel.IsNull())
     {
@@ -81,9 +82,6 @@ void DecreasingBatteryPowerSource::TimerFired()
         batteryVoltage.SetNonNull(voltage);
     }
     batteryCluster.SetBatVoltage(batteryVoltage);
-
-    // Restart the timer to continue decreasing the battery level
-    SuccessOrDie(mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval));
 }
 
 } // namespace chip::app

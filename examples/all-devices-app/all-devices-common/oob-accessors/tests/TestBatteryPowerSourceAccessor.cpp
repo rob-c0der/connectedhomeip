@@ -18,11 +18,15 @@
 
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device/api/Simulator.h>
 #include <device/types/power-source/BatteryPowerSource.h>
 #include <device/types/power-source/BatteryPowerSourceAccessor.h>
+#include <device/types/power-source/OOBAccessors.h>
+#include <device/types/power-source/impl/DecreasingBatteryPowerSource.h>
 #include <lib/core/TLV.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 #include <oob-accessors/OOBDataSerializer.h>
+#include <oob-accessors/SimulationAccessor.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DefaultTimerDelegate.h>
 #include <pw_unit_test/framework.h>
@@ -56,6 +60,7 @@ protected:
     }
 
     DefaultTimerDelegate mTimerDelegate;
+    Simulator mSimulator{ mTimerDelegate };
     Testing::TestServerClusterContext mClusterContext;
     CodeDrivenDataModelProvider mProvider{ mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider() };
     BatteryPowerSource mDevice{ "Test Battery"_span, Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable,
@@ -167,6 +172,72 @@ TEST_F(TestBatteryPowerSourceAccessor, UnhandledActionOrEndpoint)
         EXPECT_EQ(mRegistry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
                   CHIP_ERROR_NOT_FOUND);
     }
+}
+
+TEST_F(TestBatteryPowerSourceAccessor, DecreasingBatteryPowerSource_RegisterAndOOB)
+{
+    DecreasingBatteryPowerSource battery(mSimulator);
+    EXPECT_EQ(battery.Register(2, mProvider), CHIP_NO_ERROR);
+
+    InMemoryOOBAccessorRegistry registry;
+    RegisterOOBAccessors(battery, registry);
+
+    auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
+        ConcreteAttributePath(2, PowerSource::Id, PowerSource::Attributes::BatPercentRemaining::Id), static_cast<uint8_t>(100));
+    ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
+    EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
+              CHIP_NO_ERROR);
+
+    auto remaining = battery.BatteryPowerSourceCluster().GetBatPercentRemaining();
+    ASSERT_FALSE(remaining.IsNull());
+    EXPECT_EQ(remaining.Value(), 100);
+
+    // Verify TimerFired advances from current cluster values
+    battery.TimerFired();
+    remaining = battery.BatteryPowerSourceCluster().GetBatPercentRemaining();
+    ASSERT_FALSE(remaining.IsNull());
+    EXPECT_EQ(remaining.Value(), 95);
+
+    battery.Unregister(mProvider);
+}
+
+TEST_F(TestBatteryPowerSourceAccessor, DecreasingBatteryPowerSource_SimulationPauseResume)
+{
+    DecreasingBatteryPowerSource battery(mSimulator);
+    EXPECT_EQ(battery.Register(2, mProvider), CHIP_NO_ERROR);
+
+    InMemoryOOBAccessorRegistry registry;
+    EXPECT_EQ(registry.Register(std::make_unique<SimulationAccessor>(mSimulator)), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(battery.IsSimulationRunning());
+
+    // Pause via registry action
+    EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kPauseSimulationAction, {}), CHIP_NO_ERROR);
+    EXPECT_FALSE(battery.IsSimulationRunning());
+
+    // Repeated pause while already paused is a no-op
+    EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kPauseSimulationAction, {}), CHIP_NO_ERROR);
+    EXPECT_FALSE(battery.IsSimulationRunning());
+
+    // Resume via registry action
+    EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kResumeSimulationAction, {}), CHIP_NO_ERROR);
+    EXPECT_TRUE(battery.IsSimulationRunning());
+
+    // Repeated resume while already running is a no-op
+    EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kResumeSimulationAction, {}), CHIP_NO_ERROR);
+    EXPECT_TRUE(battery.IsSimulationRunning());
+
+    // Unregister stops the simulation
+    battery.Unregister(mProvider);
+    EXPECT_FALSE(battery.IsSimulationRunning());
+}
+
+TEST_F(TestBatteryPowerSourceAccessor, NonSimulatedBatteryPowerSource_IgnoresSimulationActions)
+{
+    // mDevice is a base non-simulated BatteryPowerSource registered in SetUp().
+    // Since it has no simulation control, simulation pause/resume actions are unhandled.
+    EXPECT_EQ(mRegistry.HandleAction(OOBDataSerializer::kPauseSimulationAction, {}), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(mRegistry.HandleAction(OOBDataSerializer::kResumeSimulationAction, {}), CHIP_ERROR_NOT_FOUND);
 }
 
 } // namespace
